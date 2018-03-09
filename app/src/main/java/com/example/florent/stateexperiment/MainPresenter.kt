@@ -3,7 +3,7 @@ package com.example.florent.stateexperiment
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
@@ -11,13 +11,12 @@ class MainPresenter(
         private val repository: MainRepository
 ) {
 
-    private val disposables = CompositeDisposable()
+    private lateinit var disposable: Disposable
     private val input: Subject<MainAction> = PublishSubject.create()
     private val output: Observable<MainUiModel>
 
     init {
         output = input.publish { it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository)) }
-                .share()
                 .cache()
     }
 
@@ -36,13 +35,13 @@ class MainPresenter(
     fun attach(view: View) {
         view.inputs().subscribe(input)
 
-        disposables.add(output
+        disposable = output
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::render))
+                .subscribe(view::render)
     }
 
     fun detach() {
-        disposables.clear()
+        disposable.dispose()
     }
 
     interface View {
