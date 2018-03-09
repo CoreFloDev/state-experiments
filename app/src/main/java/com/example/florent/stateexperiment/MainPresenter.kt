@@ -4,14 +4,22 @@ import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 
 class MainPresenter(
         private val repository: MainRepository
 ) {
 
     private val disposables = CompositeDisposable()
+    private val input: Subject<MainAction> = PublishSubject.create()
+    private val output: Observable<MainUiModel>
 
-    private var stream: Observable<MainUiModel>? = null
+    init {
+        output = input.publish { it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository)) }
+                .share()
+                .cache()
+    }
 
     companion object {
         fun networkCall(repository: MainRepository): ObservableTransformer<MainAction.Refresh, MainUiModel> {
@@ -26,23 +34,11 @@ class MainPresenter(
     }
 
     fun attach(view: View) {
+        view.inputs().subscribe(input)
 
-        if (stream == null) {
-            stream = view.inputs()
-                    .publish {
-                        it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository))
-                    }
-                    .share()
-                    .cache()
-        }
-
-        stream?.run {
-            disposables.add(this
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(view::render)
-            )
-        }
-
+        disposables.add(output
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view::render))
     }
 
     fun detach() {
