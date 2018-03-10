@@ -4,6 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.observables.ConnectableObservable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
@@ -13,11 +14,11 @@ class MainPresenter(
 
     private lateinit var disposable: Disposable
     private val input: Subject<MainAction> = PublishSubject.create()
-    private val output: Observable<MainUiModel>
+    private val output: ConnectableObservable<MainUiModel>
 
     init {
         output = input.publish { it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository)) }
-                .cache()
+                .replay(1)
     }
 
     companion object {
@@ -38,6 +39,8 @@ class MainPresenter(
         disposable = output
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::render)
+
+        output.connect()
     }
 
     fun detach() {
