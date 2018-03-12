@@ -7,7 +7,7 @@ import io.reactivex.disposables.Disposable
 
 class MainPresenter(
         private val repository: MainRepository,
-        private val observableViewModel: MainViewModel
+        private val viewModel: MainViewModel
 ) {
 
     private var disposable: Disposable? = null
@@ -25,7 +25,7 @@ class MainPresenter(
     }
 
     fun attach(view: View) {
-        disposable = observableViewModel.caching(view.inputs()) {
+        disposable = viewModel.caching(view.inputs()) {
             publish {
                 it.ofType(MainAction.Refresh::class.java)
                         .compose(networkCall(repository))
