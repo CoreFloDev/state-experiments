@@ -21,9 +21,9 @@ abstract class ObservableViewModel<Input, Output> : ViewModel() {
 
         if (output == null) {
             output = input.init().replay(1)
+            disposable = output!!.connect()
         }
 
-        disposable = output!!.connect()
         return output!!
     }
 
