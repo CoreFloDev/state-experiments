@@ -1,5 +1,6 @@
 package com.example.florent.stateexperiment
 
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View.GONE
@@ -13,28 +14,20 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), View {
 
-    private var presenter: MainPresenter? = null
+    private lateinit var presenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        presenter = MainPresenter(MainRepository(), viewModel)
 
-        if (Injector.presenter == null) {
-            Injector.presenter = MainPresenter(MainRepository())
-            println("Singleton initialisation")
-        }
-
-        presenter = Injector.presenter
-
-        presenter?.attach(this)
+        presenter.attach(this)
     }
 
     override fun onDestroy() {
-        presenter?.detach()
-        if (isFinishing) {
-            Injector.presenter = null
-        }
+        presenter.detach()
         super.onDestroy()
     }
 

@@ -4,22 +4,13 @@ import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.observables.ConnectableObservable
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 
 class MainPresenter(
-        private val repository: MainRepository
+        private val repository: MainRepository,
+        private val viewModel: MainViewModel
 ) {
 
-    private lateinit var disposable: Disposable
-    private val input: Subject<MainAction> = PublishSubject.create()
-    private val output: ConnectableObservable<MainUiModel>
-
-    init {
-        output = input.publish { it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository)) }
-                .replay(1)
-    }
+    private var disposable: Disposable? = null
 
     companion object {
         fun networkCall(repository: MainRepository): ObservableTransformer<MainAction.Refresh, MainUiModel> {
@@ -34,17 +25,16 @@ class MainPresenter(
     }
 
     fun attach(view: View) {
-        view.inputs().subscribe(input)
-
-        disposable = output
-                .observeOn(AndroidSchedulers.mainThread())
+        disposable = viewModel.caching(view.inputs(), ObservableTransformer {
+            it.publish {
+                it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository))
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::render)
-
-        output.connect()
     }
 
     fun detach() {
-        disposable.dispose()
+        disposable?.dispose()
     }
 
     interface View {
@@ -61,3 +51,5 @@ sealed class MainUiModel {
     object Refreshing : MainUiModel()
     data class Display(val name: String) : MainUiModel()
 }
+
+class MainViewModel : ObservableViewModel<MainAction, MainUiModel>()
