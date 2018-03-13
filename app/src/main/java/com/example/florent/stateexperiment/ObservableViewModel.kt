@@ -2,6 +2,7 @@ package com.example.florent.stateexperiment
 
 import android.arch.lifecycle.ViewModel
 import io.reactivex.Observable
+import io.reactivex.ObservableTransformer
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
@@ -11,12 +12,12 @@ abstract class ObservableViewModel<Input, Output> : ViewModel() {
 
     fun caching(
             source: Observable<Input>,
-            init: Observable<Input>.() -> Observable<Output>
+            init: ObservableTransformer<Input, Output>
     ): Observable<Output> {
         source.subscribe(input)
 
         if (output == null) {
-            output = input.init().replay(1).autoConnect()
+            output = input.compose(init).replay(1).autoConnect()
         }
 
         return output!!

@@ -25,12 +25,11 @@ class MainPresenter(
     }
 
     fun attach(view: View) {
-        disposable = viewModel.caching(view.inputs()) {
-            publish {
-                it.ofType(MainAction.Refresh::class.java)
-                        .compose(networkCall(repository))
+        disposable = viewModel.caching(view.inputs(), ObservableTransformer {
+            it.publish {
+                it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository))
             }
-        }.observeOn(AndroidSchedulers.mainThread())
+        }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::render)
     }
 
