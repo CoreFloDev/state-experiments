@@ -8,6 +8,7 @@ import io.reactivex.observables.ConnectableObservable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
+
 class MainPresenter(
         private val repository: MainRepository
 ) {

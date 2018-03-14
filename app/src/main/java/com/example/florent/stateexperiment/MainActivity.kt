@@ -7,34 +7,29 @@ import android.view.View.VISIBLE
 import com.example.florent.stateexperiment.MainPresenter.View
 import com.example.florent.stateexperiment.MainUiModel.Display
 import com.example.florent.stateexperiment.MainUiModel.Refreshing
+import com.example.florent.stateexperiment.injection.DaggerMainComponent
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), View {
 
-    private var presenter: MainPresenter? = null
+    @Inject
+    lateinit var presenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        DaggerMainComponent.create()
+                .inject(this)
 
-        if (Injector.presenter == null) {
-            Injector.presenter = MainPresenter(MainRepository())
-            println("Singleton initialisation")
-        }
-
-        presenter = Injector.presenter
-
-        presenter?.attach(this)
+        presenter.attach(this)
     }
 
     override fun onDestroy() {
-        presenter?.detach()
-        if (isFinishing) {
-            Injector.presenter = null
-        }
+        presenter.detach()
         super.onDestroy()
     }
 
