@@ -10,7 +10,7 @@ abstract class ObservableViewModel<Input, Output> : ViewModel() {
     private val input: Subject<Input> = PublishSubject.create()
     private var output: Observable<Output>? = null
 
-    fun caching(
+    protected fun caching(
             source: Observable<Input>,
             init: ObservableTransformer<Input, Output>
     ): Observable<Output> {

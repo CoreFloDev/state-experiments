@@ -5,10 +5,10 @@ import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 
-class MainPresenter(
-        private val repository: MainRepository,
-        private val viewModel: MainViewModel
-) {
+class MainPresenter : ObservableViewModel<MainAction, MainUiModel>() {
+
+    // This will ideally instantiated through dagger/similar
+    private val repository = MainRepository()
 
     private var disposable: Disposable? = null
 
@@ -24,8 +24,8 @@ class MainPresenter(
         }
     }
 
-    fun attach(view: View) {
-        disposable = viewModel.caching(view.inputs(), ObservableTransformer {
+    fun attach(view: MainPresenter.View): Disposable {
+        return caching(view.inputs(), ObservableTransformer {
             it.publish {
                 it.ofType(MainAction.Refresh::class.java).compose(networkCall(repository))
             }
@@ -51,5 +51,3 @@ sealed class MainUiModel {
     object Refreshing : MainUiModel()
     data class Display(val name: String) : MainUiModel()
 }
-
-class MainViewModel : ObservableViewModel<MainAction, MainUiModel>()

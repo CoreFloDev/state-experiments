@@ -20,9 +20,7 @@ class MainActivity : AppCompatActivity(), View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        presenter = MainPresenter(MainRepository(), viewModel)
-
+        presenter = ViewModelProviders.of(this).get(MainPresenter::class.java)
         presenter.attach(this)
     }
 
