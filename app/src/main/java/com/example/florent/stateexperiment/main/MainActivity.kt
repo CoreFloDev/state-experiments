@@ -1,13 +1,15 @@
-package com.example.florent.stateexperiment
+package com.example.florent.stateexperiment.main
 
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.example.florent.stateexperiment.MainPresenter.View
-import com.example.florent.stateexperiment.MainUiModel.Display
-import com.example.florent.stateexperiment.MainUiModel.Refreshing
-import com.example.florent.stateexperiment.injection.DaggerMainComponent
+import com.example.florent.stateexperiment.R.layout
+import com.example.florent.stateexperiment.main.MainAction.Refresh
+import com.example.florent.stateexperiment.main.MainPresenter.View
+import com.example.florent.stateexperiment.main.MainUiModel.Display
+import com.example.florent.stateexperiment.main.MainUiModel.Refreshing
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,9 +22,11 @@ class MainActivity : AppCompatActivity(), View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(layout.activity_main)
 
-        DaggerMainComponent.create()
+        ViewModelProviders.of(this)
+                .get(MainViewModel::class.java)
+                .mainComponent
                 .inject(this)
 
         presenter.attach(this)
@@ -36,7 +40,7 @@ class MainActivity : AppCompatActivity(), View {
     override fun inputs(): Observable<MainAction> {
         return RxView.clicks(refresh)
                 .doOnNext { println("refresh clicked") }
-                .map { MainAction.Refresh }
+                .map { Refresh }
     }
 
     override fun render(model: MainUiModel) {

@@ -1,4 +1,4 @@
-package com.example.florent.stateexperiment
+package com.example.florent.stateexperiment.main
 
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
