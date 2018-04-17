@@ -38,13 +38,13 @@ class MainPresenter(
     }
 
     fun attach(view: View) {
-        view.inputs().subscribe(input)
-
         disposable = output
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(view::render)
 
         output.connect()
+
+        view.inputs().subscribe(input)
     }
 
     fun detach() {
