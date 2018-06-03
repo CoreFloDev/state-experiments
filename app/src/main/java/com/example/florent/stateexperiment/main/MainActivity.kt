@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.example.florent.stateexperiment.R.layout
+import com.example.florent.stateexperiment.core.arch.LifecyclePresenter
 import com.example.florent.stateexperiment.main.messages.MainAction.Refresh
 import com.example.florent.stateexperiment.main.MainPresenter.View
 import com.example.florent.stateexperiment.main.messages.MainUiModel.Display
@@ -31,12 +32,7 @@ class MainActivity : AppCompatActivity(), View {
                 .mainComponent
                 .inject(this)
 
-        presenter.attach(this)
-    }
-
-    override fun onDestroy() {
-        presenter.detach()
-        super.onDestroy()
+        lifecycle.addObserver(LifecyclePresenter(this, presenter))
     }
 
     override fun inputs(): Observable<MainAction> {
