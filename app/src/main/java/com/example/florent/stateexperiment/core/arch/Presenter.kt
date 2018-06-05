@@ -1,9 +1,8 @@
 package com.example.florent.stateexperiment.core.arch
 
-import android.arch.lifecycle.LifecycleObserver
 import io.reactivex.disposables.Disposable
 
-abstract class Presenter<V : PresenterView> : LifecycleObserver {
+abstract class Presenter<V : PresenterView> {
 
     private var disposable: Disposable? = null
 
