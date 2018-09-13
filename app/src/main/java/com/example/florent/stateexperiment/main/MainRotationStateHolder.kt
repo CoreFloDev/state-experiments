@@ -7,7 +7,7 @@ import com.example.florent.stateexperiment.injection.DaggerMainComponent
 import com.example.florent.stateexperiment.injection.MainComponent
 import com.example.florent.stateexperiment.injection.MainModule
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainRotationStateHolder(application: Application) : AndroidViewModel(application) {
 
     val mainComponent: MainComponent = DaggerMainComponent
             .builder()
