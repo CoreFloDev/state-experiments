@@ -1,12 +1,15 @@
 package com.example.florent.stateexperiment.main
 
-import com.example.florent.stateexperiment.main.MainAction.Refresh
-import com.example.florent.stateexperiment.main.MainUiModel.Display
-import com.example.florent.stateexperiment.main.MainUiModel.Refreshing
+import com.example.florent.stateexperiment.core.arch.Presenter
+import com.example.florent.stateexperiment.core.arch.PresenterView
+import com.example.florent.stateexperiment.main.messages.MainAction
+import com.example.florent.stateexperiment.main.messages.MainAction.Refresh
+import com.example.florent.stateexperiment.main.messages.MainUiModel
+import com.example.florent.stateexperiment.main.messages.MainUiModel.Display
+import com.example.florent.stateexperiment.main.messages.MainUiModel.Refreshing
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.observables.ConnectableObservable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
@@ -14,9 +17,8 @@ import io.reactivex.subjects.Subject
 
 class MainPresenter(
         private val repository: MainRepository
-) {
+) : Presenter<MainPresenter.View>() {
 
-    private lateinit var disposable: Disposable
     private val input: Subject<MainAction> = PublishSubject.create()
     private val output: ConnectableObservable<MainUiModel>
 
@@ -37,31 +39,19 @@ class MainPresenter(
         }
     }
 
-    fun attach(view: View) {
-        disposable = output
+    override fun onAttach(view: View) {
+        add(output
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::render)
+                .subscribe(view::render))
 
         output.connect()
 
         view.inputs().subscribe(input)
     }
 
-    fun detach() {
-        disposable.dispose()
-    }
-
-    interface View {
+    interface View : PresenterView {
         fun inputs(): Observable<MainAction>
         fun render(model: MainUiModel)
     }
 }
 
-sealed class MainAction {
-    object Refresh : MainAction()
-}
-
-sealed class MainUiModel {
-    object Refreshing : MainUiModel()
-    data class Display(val name: String) : MainUiModel()
-}
