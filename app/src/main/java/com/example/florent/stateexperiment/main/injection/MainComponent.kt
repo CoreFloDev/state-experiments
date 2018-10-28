@@ -1,4 +1,4 @@
-package com.example.florent.stateexperiment.injection
+package com.example.florent.stateexperiment.main.injection
 
 import com.example.florent.stateexperiment.core.injection.CoreComponent
 import com.example.florent.stateexperiment.main.MainActivity

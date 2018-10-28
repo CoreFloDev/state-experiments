@@ -1,4 +1,4 @@
-package com.example.florent.stateexperiment.injection
+package com.example.florent.stateexperiment.main.injection
 
 import com.example.florent.stateexperiment.main.MainPresenter
 import com.example.florent.stateexperiment.main.MainRepository

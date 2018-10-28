@@ -1,4 +1,4 @@
-package com.example.florent.stateexperiment.injection
+package com.example.florent.stateexperiment.main.injection
 
 import javax.inject.Scope
 
